@@ -27,11 +27,9 @@
             background-color: #f5f5f5;
         }
 
-
         /* Custom page CSS
         -------------------------------------------------- */
         /* Not required for template or sticky footer method. */
-
         .container {
             width: auto;
             max-width: 680px;
@@ -64,10 +62,10 @@
         $('#show').html('定位出错'+ error.errorCode+ error.message);
         switch(error.code) {
             case 1:
-                alert('您拒绝了使用位置共享服务，请手动输入您的就餐地址。!');
+                alert('您拒绝了使用位置共享服务!');
                 break;
             default :
-                alert('获取位置失败，请手动输入您的就餐地址。!');
+                alert('获取位置失败!');
                 break;
         }
     }
@@ -80,7 +78,7 @@
         timeout:50000,
 
         //位置信息缓存保留时长
-        maximumAge:10000
+        maximumAge:1000
     };
     var wachrID = navigator.geolocation.watchPosition(sucessCallBack,failCallBack,options);
     //清除监听
