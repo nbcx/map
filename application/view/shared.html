@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>当前位置：</div>
+<div id="show"></div>
+</body>
+<script src="https://cdn.nb.cx/jquery/jquery-1.9.1.js"></script>
+<script>
+    function sucessCallBack(position) {
+        varcoor= position.coords;
+        $('#show').html('维度:'+coor.latitude+'经度'+coor.longitude);
+    }
+
+    function failCallBack(error) {
+        $('#show').html('定位出错'+ error.errorCode+ error.message);
+        switch(error.code) {
+            case 1:
+                alert('您拒绝了使用位置共享服务，请手动输入您的就餐地址。!');
+                break;
+            default :
+                alert('获取位置失败，请手动输入您的就餐地址。!');
+                break;
+        }
+    }
+
+    var options= {
+        //是否为高经度
+        enableHightAccuracy:true,
+
+        //超时时间
+        timeout:50000,
+
+        //位置信息缓存保留时长
+        maximumAge:10000
+    };
+    var wachrID = navigator.geolocation.watchPosition(sucessCallBack,failCallBack,options);
+    //清除监听
+    //navigator.geolocation.clearWatch(watchID);
+</script>
+</html>
