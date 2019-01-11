@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <include file="header" />
+</head>
+
+<body>
+
+<include file="nav" />
+
+<div class="container">
+
+    <div class="col-12">
+        <h1 class="page-header">供应商列表</h1>
+        <form method="post" action="/supplier/post?action=del">
+            <div class="tool">
+                <a class="btn btn-success" href="/supplier/add"><span class="glyphicon glyphicon-plus"></span> 添加</a>
+                <button confirm="确定删除吗？" type="submit" class="btn btn-danger del"><span class="glyphicon glyphicon-trash"></span> 删除</button>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <td width="10"><input class="checkall" type="checkbox"></td>
+                    <td>公司名</td>
+                    <td>联系人</td>
+                    <td>联系电话</td>
+                    <td align="center">瓦线</td>
+                    <td align="center">印刷机</td>
+                    <td align="center">粘箱机</td>
+                    <td>所在省市</td>
+                    <td width="20"></td>
+                </tr>
+                </thead>
+                <tbody class="check">
+                    <volist name="suppliers" id="v">
+                        <tr>
+                            <th scope="row"><input name="id[]" value="{$v.id}" type="checkbox"></th>
+                            <td>{$v.name}</td>
+                            <td>{$v.linkman}</td>
+                            <td>{$v.phone}</td>
+                            <td align="center">{$v.tile}</td>
+                            <td align="center">{$v.press}</td>
+                            <td align="center">{$v.sticking}</td>
+                            <td>{$v.province},{$v.city},{$v.county}</td>
+                            <td><a href="/supplier/edit?id={$v.id}" class="btn btn-xs btn-primary btn-dragsort"><span class="glyphicon glyphicon-pencil"></span></a></td>
+                        </tr>
+                    </volist>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+</div> <!-- /container -->
+
+<include file="footer" />
+<script>
+    //checkbox全选/取消全选
+    $('.checkall').click(function() {
+        $("tbody input:checkbox").prop("checked",this.checked);
+    })
+    $('.del').click(function() {
+        $("tbody input:checkbox").prop("checked",this.checked);
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <include file="header" />
+</head>
+
+<body>
+
+<include file="nav" />
+
+<div class="container">
+
+    <div class="col-12">
+        <h1 class="page-header">系统设置</h1>
+        <div class="row">
+            <div class="col-md-8">
+                <form method="post" action="/system/post">
+                    <div class="form-group">
+                        <label>系统名称</label>
+                        <input name="name" type="text" class="form-control" value="{$system.name}">
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-md-4">
+                            <label>搜索范围/km</label>
+                            <input name="distance" type="text" class="form-control" value="{$system.distance}">
+                        </div>
+                    </div>
+
+                    <hr />
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </form>
+            </div>
+            <div class="col-md-4" style="border-left:1px solid #eee;">
+                <h3>搜索范围</h3>
+                <p>搜索范围指在地图上搜索时，只显示距离用户当前位置多少距离以内的供应商。</p>
+            </div>
+        </div>
+    </div>
+</div> <!-- /container -->
+
+<include file="footer" />
+
+</body>
+</html>

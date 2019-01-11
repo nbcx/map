@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <include file="header" />
+</head>
+
+<body>
+
+<include file="nav" />
+
+<div class="container">
+
+    <div class="col-12">
+        <h1 class="page-header">新增管理员</h1>
+        <div class="row">
+            <div class="col-md-8">
+                <form method="post" action="/admin/post?action=edit&id={$user.id}">
+                    <div class="form-group">
+                        <label>登录名</label>
+                        <input name="name" type="text" class="form-control" placeholder="只允许英文字母和数字" value="{$user.name}">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input name="pass" type="password" class="form-control" placeholder="留空则不修改密码">
+                    </div>
+                    <div class="row form-group">
+                        <div class="col-md-4">
+                            <label>名字</label>
+                            <input name="nickname" type="text" class="form-control" placeholder="联系人" value="{$user.nickname}">
+                        </div>
+                    </div>
+
+                    <div class="row form-group">
+                        <div class="col-md-12">
+                            <label>联系方式</label>
+                            <input name="linkme" type="text" class="form-control" placeholder="手机号或邮箱等" value="{$user.linkme}">
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row form-group">
+                        <div class="col-md-3 form-group">
+                            <label>身份类别</label>
+                            <select name="type" class="form-control">
+                                <option value="1">业务管理员</option>
+                                <option value="0">系统管理员</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <button type="submit" class="btn btn-primary">提交</button>
+                </form>
+            </div>
+            <div class="col-md-4 left-tips">
+                <h3 id="基本缩略语">身份类别</h3>
+                <p>身份类别分为系统管理员和业务管理员。</p>
+                <p>系统管理员拥有所有权限，仅无法修改创始人账号信息！</p>
+
+                <p>业务管理员仅能对公司进行添加，修改，删除等管理，以及修改自己的登录密码信息！</p>
+            </div>
+        </div>
+
+    </div>
+
+</div> <!-- /container -->
+
+<include file="footer" />
+<script>
+    $("select[name='type']").val('{$user.type}');
+</script>
+
+</body>
+</html>

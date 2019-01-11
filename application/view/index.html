@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>附近</title>
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.nb.cx/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="https://cdn.nb.cx/bootstrap/3.3.7/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <style>
+        html{height:100%}
+        body{height:100%;margin:0;padding:0}
+        #container {height:100%}
+        #myPageTop {
+            position:absolute;
+            z-index:10;
+            top:0;
+            left:50%;
+            transform:translateX(-50%);
+            background:#fff;
+            width:90%;
+            padding:20px
+        }
+        /*
+        #myPageTop #show{display:inline-block;text-align:center;padding:6px 20px;color:#fff;background:#a0c8ff;text-decoration:none}
+        #myPageTop #show{display:block;}
+        */
+        /*#myPageTop input{font-size:14px;padding:6px 8px;border:1px solid #ccc;outline:0}*/
+        /*.pageShow h3{margin:20px 0 10px}*/
+        /*#panel{position:absolute;background-color:#fff;max-height:90%;overflow-y:auto;top:10px;right:10px;width:280px}*/
+        .infowindow-content{padding:12px 8px;color:#fff;background:#ccc}
+        /*h3{font-family:microsoft yahei;!important}*/
+        .pageShow{display:none}
+        .anchorBL{
+            display:none;
+        }
+    </style>
+    <script src="https://cdn.nb.cx/jquery/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak={$ak}"></script>
+    <script type="text/javascript" src="_pub_app.js?v=4"></script>
+</head>
+<body>
+<div id="myPageTop">
+    <div class="input-group">
+        <input type="text" class="form-control" id="text">
+        <span class="input-group-addon" id="show" style="cursor: pointer">搜索</span>
+    </div>
+
+    <div class="pageShow">
+        <div style="margin-top: 20px" id="suppliers">
+            <!--
+                <hr />
+                <div class="media">
+                    <div class="media-body">
+                        <h4 class="media-heading">xxxx</h4>
+                        北京市朝阳区霄云路50号 距离市中心约7380米
+                    </div>
+                    <div class="media-right">
+                        <a href="#">
+                            500Km
+                        </a>
+                    </div>
+                </div>
+                -->
+        </div>
+    </div>
+</div>
+<div id="container"></div>
+<div id="panel"></div>
+<script>
+    // 百度地图API功能
+    var map = new BMap.Map("container");
+
+    var llng,llat,search='';
+
+    function translate(suppliers) {
+        var points = [];
+        for ( var i = 0; i <suppliers.length; i++){
+            points[i] =new BMap.Point(suppliers[i].longitude,suppliers[i].latitude)
+            //points.push(new BMap.Point(suppliers[i].longitude,suppliers[i].latitude))
+        }
+        console.log(points);
+        //坐标转换完之后的回调函数
+        var convertor = new BMap.Convertor();
+        convertor.translate(points, 1, 3, function (data){
+            if(data.status === 0) {
+                for (var i = 0; i < data.points.length; i++) {
+                    var marker=new BMap.Marker(data.points[i]);
+
+                    //显示数字序号
+                    var label = new BMap.Label(i+1, {
+                        offset : new BMap.Size(5, 4)
+                    });
+                    label.setStyle({
+                        background:'none',color:'#fff',border:'none'//只要对label样式进行设置就可达到在标注图标上显示数字的效果
+                    });
+                    marker.setLabel(label);//显示地理名称 a 
+
+                    var html='<a href="https://nb.cx" target="_blank">nb</a>'+suppliers[i].name;
+                    var infoWindow = new BMap.InfoWindow(html);//创建窗口信息
+                    marker.infoWindow=infoWindow;//给当前标注新增一个属性以便保存窗口信息infoWindow
+                    //添加标注的点击事件回调
+                    marker.addEventListener("click", function(e){
+                        //点击标注时，打开改标注对应的回调信息
+                        this.openInfoWindow(e.target.infoWindow);
+                        //如果没猜错，你原来在这里的代码应该如下：
+                        //this.openInfoWindow(infoWindow);
+                        //那样就会导致每次标注点击后，弹出的窗口信息都是最后一次循环的infoWindow。
+                        //因为在click的时候只会去找infoWindow这个变量值，而你的click肯定是在所有循环的
+                        //标注都产生完之后，此时infoWindow变量已经被赋值成了最后一次循环的值。
+                    });
+                    map.addOverlay(marker);//添加标注到地图
+
+
+                    //bm.addOverlay(marker);
+                    map.setCenter(data.points[i]);
+                }
+            }
+        })
+    }
+    
+    function drawlist(suppliers) {
+        var htmlist = '';
+        for ( var i = 0; i <suppliers.length; i++){
+            var sps = suppliers[i];
+            htmlist += '<hr />\n' +
+            '<div class="media">\n' +
+            '   <div class="media-body">\n' +
+            '        <h4 class="media-heading">'+sps.name+'</h4>\n' + sps.address +
+            '   </div>\n' +
+            '   <div class="media-right">\n' +
+            '         <span href="#">'+sps.dist+'</span>km\n' +
+            '   </div>\n' +
+            '</div>'
+        }
+        $('#suppliers').html(htmlist);
+    }
+
+    localpos(function (lng,lat) {
+        llng = lng;
+        llat = lat;
+        var point=new BMap.Point(lng,lat);
+        map.centerAndZoom(point,11);
+        map.addControl(new BMap.ScaleControl());
+        map.addControl(new BMap.OverviewMapControl());
+        map.addControl(new BMap.MapTypeControl());
+        map.enableScrollWheelZoom()
+
+        //var myIcon = new BMap.Icon("https://api.map.baidu.com/img/markers.png", new BMap.Size(23, 25), {
+        //    offset: new BMap.Size(10, 25), // 指定定位位置
+        //    imageOffset: new BMap.Size(0, 0 - 10 * 25) // 设置图片偏移
+        //});
+
+        var myIcon = new BMap.Icon("_pub_img/circle.png", new BMap.Size(24, 24), {
+            offset: new BMap.Size(10, 25), // 指定定位位置
+            imageOffset: new BMap.Size(0, 0) // 设置图片偏移
+        });
+        var marker = new BMap.Marker(point,{icon:myIcon});
+        //marker.setAnimation(BMAP_ANIMATION_BOUNCE);//跳动的动画
+        map.addOverlay(marker);//标出所在地
+        map.panTo(point);//地图中心移动
+        marker.enableDragging();
+
+        //var point = new BMap.Point(longitudeValue,latitudeValue);//用所定位的经纬度查找所在地省市街道等信息
+        //var gc = new BMap.Geocoder();
+        //gc.getLocation(point, function(rs){
+        //    console.log(rs.address);//地址信息
+        //});
+
+        $.post("/index/post",{lat:lat,lng:lng},function(result){
+            var suppliers =JSON.parse(result);
+            translate(suppliers);
+            drawlist(suppliers);
+        });
+    })
+
+    $("#show").on('click',function(){
+        $text = $('#text').val();
+        if($text == search) {
+            $('.pageShow').slideToggle();
+            return;
+        }
+        search = $text;
+        map.clearOverlays();//清空原来的标注
+        $.post("/index/post",{lat:llat,lng:llng,search:$text},function(result){
+            var suppliers =JSON.parse(result);
+            translate(suppliers);
+            drawlist(suppliers);
+            if($('.pageShow').css("display") == 'none') {
+                $('.pageShow').slideToggle();
+            }
+        });
+    })
+    $("#container").on('click',function(){
+        if($('.pageShow').css("display") == 'block') {
+            $('.pageShow').slideToggle();
+        }
+    })
+</script>
+</body>
+</html>
