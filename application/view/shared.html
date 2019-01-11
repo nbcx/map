@@ -47,7 +47,7 @@
         <h1>当前位置</h1>
     </div>
     <p id="show" class="lead"></p>
-    <p>Use <a href="../sticky-footer-navbar">the sticky footer with a fixed navbar</a> if need be, too.</p>
+    <p>Time: <a href="#" id="time">the sticky footer with a fixed navbar</a></p>
 </div>
 
 </body>
@@ -56,6 +56,8 @@
     function sucessCallBack(position) {
         var coor= position.coords;
         $('#show').html('维度:'+coor.latitude+'经度'+coor.longitude);
+        var timestamp = Date.parse(new Date());
+        $('#time').html(timestamp);
     }
 
     function failCallBack(error) {
