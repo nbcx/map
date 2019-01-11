@@ -2,11 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>共享定位</title>
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.nb.cx/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="https://cdn.nb.cx/bootstrap/3.3.7/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <style>
+        /* Sticky footer styles
+-------------------------------------------------- */
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+        body {
+            /* Margin bottom by footer height */
+            margin-bottom: 60px;
+        }
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            /* Set the fixed height of the footer here */
+            height: 60px;
+            background-color: #f5f5f5;
+        }
+
+
+        /* Custom page CSS
+        -------------------------------------------------- */
+        /* Not required for template or sticky footer method. */
+
+        .container {
+            width: auto;
+            max-width: 680px;
+            padding: 0 15px;
+        }
+        .container .text-muted {
+            margin: 20px 0;
+        }
+    </style>
 </head>
 <body>
-<div>当前位置：</div>
-<div id="show"></div>
+<!-- Begin page content -->
+<div class="container">
+    <div class="page-header">
+        <h1>当前位置</h1>
+    </div>
+    <p id="show" class="lead"></p>
+    <p>Use <a href="../sticky-footer-navbar">the sticky footer with a fixed navbar</a> if need be, too.</p>
+</div>
+
 </body>
 <script src="https://cdn.nb.cx/jquery/jquery-1.9.1.js"></script>
 <script>
