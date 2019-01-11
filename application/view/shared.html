@@ -8,8 +8,7 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="https://cdn.nb.cx/bootstrap/3.3.7/ie10-viewport-bug-workaround.css" rel="stylesheet">
     <style>
-        /* Sticky footer styles
--------------------------------------------------- */
+        /* Sticky footer styles */
         html {
             position: relative;
             min-height: 100%;
@@ -80,7 +79,8 @@
         timeout:50000,
 
         //位置信息缓存保留时长
-        maximumAge:1000
+        maximumAge:0
+
     };
     var wachrID = navigator.geolocation.watchPosition(sucessCallBack,failCallBack,options);
     //清除监听
