@@ -25,4 +25,8 @@ class Shared extends Controller {
         $this->display('shared');
     }
 
+    public function post() {
+
+    }
+
 }

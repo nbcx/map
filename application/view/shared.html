@@ -26,8 +26,7 @@
             background-color: #f5f5f5;
         }
 
-        /* Custom page CSS
-        -------------------------------------------------- */
+        /* Custom page CSS */
         /* Not required for template or sticky footer method. */
         .container {
             width: auto;
@@ -51,6 +50,7 @@
 
 </body>
 <script src="https://cdn.nb.cx/jquery/jquery-1.9.1.js"></script>
+<script src="_pub_websocket.js"></script>
 <script>
     function sucessCallBack(position) {
         var coor= position.coords;
@@ -71,7 +71,7 @@
         }
     }
 
-    var options= {
+    var wachrID = navigator.geolocation.watchPosition(sucessCallBack,failCallBack,{
         //是否为高经度
         enableHightAccuracy:true,
 
@@ -80,9 +80,7 @@
 
         //位置信息缓存保留时长
         maximumAge:0
-
-    };
-    var wachrID = navigator.geolocation.watchPosition(sucessCallBack,failCallBack,options);
+    });
     //清除监听
     //navigator.geolocation.clearWatch(watchID);
 </script>
