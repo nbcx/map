@@ -73,7 +73,7 @@
             marker = cmarker(coor.longitude,coor.latitude);
         }
         else {
-            map.clearOverlays();//清空原来的标注
+            //map.clearOverlays();//清空原来的标注
             marker.setPosition(new BMap.Point(coor.longitude,coor.latitude));
         }
         $('#show').html('维度:'+coor.latitude+'经度'+coor.longitude);
@@ -131,6 +131,7 @@
         map.addOverlay(marker);//标出所在地
         map.panTo(point);//地图中心移动
         marker.enableDragging();//设置可拖拽
+        return marker;
     }
 
     $('#me').click(function () {
