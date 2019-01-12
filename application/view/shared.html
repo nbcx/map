@@ -72,8 +72,11 @@
         if(!marker) {
             marker = cmarker(coor.longitude,coor.latitude);
         }
+        else {
+            map.clearOverlays();//清空原来的标注
+            marker.setPosition(new BMap.Point(coor.longitude,coor.latitude));
+        }
         $('#show').html('维度:'+coor.latitude+'经度'+coor.longitude);
-        marker.setPosition(new BMap.Point(coor.longitude,coor.latitude));
         var timestamp = Date.parse(new Date());
         $('#time').html(timestamp);
         //client.send({
@@ -129,7 +132,6 @@
         map.panTo(point);//地图中心移动
         marker.enableDragging();//设置可拖拽
     }
-
 
     $('#me').click(function () {
         marker.setPosition(new BMap.Point(121.433806,31.192588));
