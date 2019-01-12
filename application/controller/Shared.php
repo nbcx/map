@@ -9,6 +9,8 @@
  */
 namespace controller;
 
+use bin\Config;
+use nb\Server;
 use util\Controller;
 
 /**
@@ -23,6 +25,8 @@ class Shared extends Controller {
 
     public function index() {
         $this->assign('ak','DD205ad29d809f6a8cc23d82189745fa');
+        $ip = Config::$o->ip;
+        $this->assign('server',"ws://{$ip}:9503");
         $this->display('shared');
     }
 
@@ -30,12 +34,14 @@ class Shared extends Controller {
         $serv = Server::driver();
         $conn_list = Server::driver()->getClientList(0, 100);
         if ($conn_list===false or count($conn_list) === 0) {
-            echo "finish\n";
+            //echo "finish\n";
             return;
         }
-        //$start_fd = end($conn_list);
-        //var_dump($conn_list);
+        $mefd =  $serv->fd;
         foreach($conn_list as $fd) {
+            if($mefd == $fd) {
+                break;
+            }
             $serv->push($fd,json_encode([
                 'action'=> 'push-postion',
                 'fd'=>$fd,

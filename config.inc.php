@@ -17,6 +17,8 @@ return [
 
     'default_index' => 'shared',
 
+    'ip'=>'127.0.0.1',
+
     //数据库配置
     'dao' => [
         'driver'	=> 'mysql',

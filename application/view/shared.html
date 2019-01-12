@@ -62,10 +62,12 @@
 <script src="_pub_websocket.js"></script>
 <script type="text/javascript" src="_pub_app.js?v=4"></script>
 <script>
-    //var client = new Client('ws://127.0.0.1:9503',function () {})
+    var client = new Client('{$server}',function () {})
     var marker;//我的位置标记
     // 百度地图API功能
     var map = new BMap.Map("container");
+
+    var markers = [];//别人的位置
 
     function sucessCallBack(position) {
         var coor= position.coords;
@@ -79,11 +81,11 @@
         $('#show').html('维度:'+coor.latitude+'经度'+coor.longitude);
         var timestamp = Date.parse(new Date());
         $('#time').html(timestamp);
-        //client.send({
-        //    action:'shared/post',
-        //    lat:coor.latitude,
-        //    lng:coor.longitude,
-        //});
+        client.send({
+            action:'shared/post',
+            lat:coor.latitude,
+            lng:coor.longitude,
+        });
     }
 
     function failCallBack(error) {
@@ -109,9 +111,27 @@
     //清除监听
     //navigator.geolocation.clearWatch(watchID);
 
-    //client.push('postion',function (data) {
-    //    console.log(data);
-    //})
+    //位置更新
+    client.push('postion',function (pos) {
+        console.log(pos);
+        if(markers[pos.fd]) {
+            markers[pos.fd].setPosition(new BMap.Point(pos.lng,pos.lat));
+        }
+        else {
+            markers[pos.fd] = omarker(pos.fd,pos.lng,pos.lat)
+        }
+    })
+
+    client.push('start',function (pos) {
+        console.log(data);
+        markers[pos.fd] = false;
+    })
+
+    //退出
+    client.push('exit',function (pos) {
+        console.log(data);
+        markers[pos.fd] = false;
+    })
 
     function cmarker(lng,lat) {
         var point=new BMap.Point(lng,lat);
@@ -127,6 +147,27 @@
         });
         //var
         marker = new BMap.Marker(point,{icon:myIcon});
+        //marker.setAnimation(BMAP_ANIMATION_BOUNCE);//跳动的动画
+        map.addOverlay(marker);//标出所在地
+        map.panTo(point);//地图中心移动
+        marker.enableDragging();//设置可拖拽
+        return marker;
+    }
+
+    function omarker(name,lng,lat) {
+        var point=new BMap.Point(lng,lat);
+        map.centerAndZoom(point,11);
+        map.addControl(new BMap.ScaleControl());
+        map.addControl(new BMap.OverviewMapControl());
+        map.addControl(new BMap.MapTypeControl());
+        map.enableScrollWheelZoom()
+
+        var myIcon = new BMap.Icon("https://api.map.baidu.com/img/markers.png", new BMap.Size(23, 25), {
+            offset: new BMap.Size(10, 25), // 指定定位位置
+            imageOffset: new BMap.Size(0, 0 - 10 * 25) // 设置图片偏移
+        });
+
+        var marker = new BMap.Marker(point,{icon:myIcon});
         //marker.setAnimation(BMAP_ANIMATION_BOUNCE);//跳动的动画
         map.addOverlay(marker);//标出所在地
         map.panTo(point);//地图中心移动
