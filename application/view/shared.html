@@ -10,22 +10,16 @@
     <style>
         /* Sticky footer styles */
         html {
+            height:100%;
             position: relative;
             min-height: 100%;
         }
         body {
             /* Margin bottom by footer height */
-            margin-bottom: 60px;
+            height:100%;
+            margin:0;
+            padding:0
         }
-        .footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            /* Set the fixed height of the footer here */
-            height: 60px;
-            background-color: #f5f5f5;
-        }
-
         /* Custom page CSS */
         /* Not required for template or sticky footer method. */
         .container {
@@ -33,14 +27,28 @@
             max-width: 680px;
             padding: 0 15px;
         }
-        .container .text-muted {
-            margin: 20px 0;
+        #container {
+            height:100%;
+            width:100%;
+        }
+        .anchorBL{
+            display:none;
+        }
+        #me {
+            position:absolute;
+            left: 10px;
+            bottom: 10px;
+            width: 30px;
+            height: 30px;
+            background: aqua;
         }
     </style>
 </head>
 <body>
+<div id="container">1</div>
+<div id="me"></div>
 <!-- Begin page content -->
-<div class="container">
+<div class="container" style="display: none">
     <div class="page-header">
         <h1>当前位置</h1>
     </div>
@@ -50,13 +58,29 @@
 
 </body>
 <script src="https://cdn.nb.cx/jquery/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak={$ak}"></script>
 <script src="_pub_websocket.js"></script>
+<script type="text/javascript" src="_pub_app.js?v=4"></script>
 <script>
+    //var client = new Client('ws://127.0.0.1:9503',function () {})
+    var marker;//我的位置标记
+    // 百度地图API功能
+    var map = new BMap.Map("container");
+
     function sucessCallBack(position) {
         var coor= position.coords;
+        if(!marker) {
+            marker = cmarker(coor.longitude,coor.latitude);
+        }
         $('#show').html('维度:'+coor.latitude+'经度'+coor.longitude);
+        marker.setPosition(new BMap.Point(coor.longitude,coor.latitude));
         var timestamp = Date.parse(new Date());
         $('#time').html(timestamp);
+        //client.send({
+        //    action:'shared/post',
+        //    lat:coor.latitude,
+        //    lng:coor.longitude,
+        //});
     }
 
     function failCallBack(error) {
@@ -74,14 +98,41 @@
     var wachrID = navigator.geolocation.watchPosition(sucessCallBack,failCallBack,{
         //是否为高经度
         enableHightAccuracy:true,
-
         //超时时间
         timeout:50000,
-
         //位置信息缓存保留时长
         maximumAge:0
     });
     //清除监听
     //navigator.geolocation.clearWatch(watchID);
+
+    //client.push('postion',function (data) {
+    //    console.log(data);
+    //})
+
+    function cmarker(lng,lat) {
+        var point=new BMap.Point(lng,lat);
+        map.centerAndZoom(point,11);
+        map.addControl(new BMap.ScaleControl());
+        map.addControl(new BMap.OverviewMapControl());
+        map.addControl(new BMap.MapTypeControl());
+        map.enableScrollWheelZoom()
+
+        var myIcon = new BMap.Icon("_pub_circle.png", new BMap.Size(24, 24), {
+            offset: new BMap.Size(10, 25), // 指定定位位置
+            imageOffset: new BMap.Size(0, 0) // 设置图片偏移
+        });
+        //var
+        marker = new BMap.Marker(point,{icon:myIcon});
+        //marker.setAnimation(BMAP_ANIMATION_BOUNCE);//跳动的动画
+        map.addOverlay(marker);//标出所在地
+        map.panTo(point);//地图中心移动
+        marker.enableDragging();//设置可拖拽
+    }
+
+
+    $('#me').click(function () {
+        marker.setPosition(new BMap.Point(121.433806,31.192588));
+    })
 </script>
 </html>

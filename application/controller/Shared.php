@@ -22,11 +22,36 @@ use util\Controller;
 class Shared extends Controller {
 
     public function index() {
+        $this->assign('ak','DD205ad29d809f6a8cc23d82189745fa');
         $this->display('shared');
     }
 
-    public function post() {
+    public function post($lat,$lng) {
+        $serv = Server::driver();
+        $conn_list = Server::driver()->getClientList(0, 100);
+        if ($conn_list===false or count($conn_list) === 0) {
+            echo "finish\n";
+            return;
+        }
+        //$start_fd = end($conn_list);
+        //var_dump($conn_list);
+        foreach($conn_list as $fd) {
+            $serv->push($fd,json_encode([
+                'action'=> 'push-postion',
+                'fd'=>$fd,
+                'lat'=>$lat,
+                'lng'=>$lng
+            ]));
+        }
+    }
 
+    protected function push($fd,$action,array $data=null) {
+        $redata = [
+            "action"=> 'push-'.$action,
+        ];
+        $data and $redata = array_merge($redata,$data);
+        b('push-'.$fd,$redata);
+        Server::driver()->push($fd,json_encode($redata));
     }
 
 }

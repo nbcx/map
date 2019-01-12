@@ -15,6 +15,8 @@ return [
     //是否开启调试
     'debug'=>true,
 
+    'default_index' => 'shared',
+
     //数据库配置
     'dao' => [
         'driver'	=> 'mysql',

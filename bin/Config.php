@@ -21,8 +21,6 @@ namespace bin;
  */
 class Config extends \nb\Config {
 
-    public $default_index = 'index';
-
     //自动包含路径
     public $path_autoinclude =  [
         __APP__.'bin'.DS
@@ -62,9 +60,5 @@ class Config extends \nb\Config {
         'default'=>false,//是否关闭默认路由，true 是，false 不关闭
         //'match'=>__APP__.'bin'.DS.'router.inc'
     ];
-
-    //上传设置
-    protected function _upload() {
-        return include(__APP__.'bin'.DS.'upload.inc');
-    }
+    
 }

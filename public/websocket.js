@@ -1,4 +1,4 @@
-function Client(open) {
+function Client(server,open) {
 
     var oTemp = new Object;
 
