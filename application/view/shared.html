@@ -47,14 +47,6 @@
 <body>
 <div id="container">1</div>
 <div id="me"></div>
-<!-- Begin page content -->
-<div class="container" style="display: none">
-    <div class="page-header">
-        <h1>当前位置</h1>
-    </div>
-    <p id="show" class="lead"></p>
-    <p>Time: <a href="#" id="time">the sticky footer with a fixed navbar</a></p>
-</div>
 
 </body>
 <script src="https://cdn.nb.cx/jquery/jquery-1.9.1.js"></script>
@@ -62,14 +54,21 @@
 <script src="_pub_websocket.js"></script>
 <script type="text/javascript" src="_pub_app.js?v=4"></script>
 <script>
-    var client = new Client('{$server}',function () {})
+    var client = new Client('{$server}',function () {
+        //上报我的地图编号到服务器
+        client.send({
+            action:'shared/enroll',
+            map:'{$map}'
+        });
+    })
+
     var marker;//我的位置标记
     // 百度地图API功能
     var map = new BMap.Map("container");
 
     var markers = [];//别人的位置
 
-    function sucessCallBack(position) {
+    var sucess = function(position) {
         var coor= position.coords;
         if(!marker) {
             marker = cmarker(coor.longitude,coor.latitude);
@@ -78,17 +77,18 @@
             //map.clearOverlays();//清空原来的标注
             marker.setPosition(new BMap.Point(coor.longitude,coor.latitude));
         }
-        $('#show').html('维度:'+coor.latitude+'经度'+coor.longitude);
-        var timestamp = Date.parse(new Date());
-        $('#time').html(timestamp);
+        //$('#show').html('维度:'+coor.latitude+'经度'+coor.longitude);
+        //var timestamp = Date.parse(new Date());
+        //$('#time').html(timestamp);
         client.send({
             action:'shared/post',
+            map:'{$map}',
             lat:coor.latitude,
             lng:coor.longitude,
         });
     }
 
-    function failCallBack(error) {
+    var fail = function(error) {
         $('#show').html('定位出错'+ error.errorCode+ error.message);
         switch(error.code) {
             case 1:
@@ -100,7 +100,24 @@
         }
     }
 
-    var wachrID = navigator.geolocation.watchPosition(sucessCallBack,failCallBack,{
+    //获取我的地图信息
+    client.reply('enroll',function (pos) {
+        console.log(pos);
+        $.each(pos.data,function (k,v) {
+            var point = v.split(":");
+
+            if(markers[k]) {
+                markers[k].setPosition(new BMap.Point(point[0],point[1]));
+            }
+            else {
+                markers[k] = omarker(k,point[0],point[1])
+            }
+        })
+
+    })
+
+    //注册位置变动事件
+    navigator.geolocation.watchPosition(sucess,fail,{
         //是否为高经度
         enableHightAccuracy:true,
         //超时时间
@@ -109,7 +126,8 @@
         maximumAge:0
     });
     //清除监听
-    //navigator.geolocation.clearWatch(watchID);
+    //var wachrID =
+    // navigator.geolocation.clearWatch(watchID);
 
     //位置更新
     client.push('postion',function (pos) {
@@ -120,11 +138,6 @@
         else {
             markers[pos.fd] = omarker(pos.fd,pos.lng,pos.lat)
         }
-    })
-
-    client.push('start',function (pos) {
-        console.log(data);
-        markers[pos.fd] = false;
     })
 
     //退出

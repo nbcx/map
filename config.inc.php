@@ -46,10 +46,22 @@ return [
         'enable_pid'=>__APP__.'tmp'.DS.'swoole.pid',
         'daemonize'=>false,
         //异步任务处理配置
-        'task_worker_num'=>2,
+        //'task_worker_num'=>0,
         'enable_http'=>true,//启用内置的onRequest回调
     ],
 
+    //缓存服务器配置
+    'redis' => [
+        'host' => '127.0.0.1',
+        'port' => 6379,
+        'password' => '',
+        'select' => 2,
+        'timeout' => 0,
+        'expire' => 0,
+        'persistent' => false,
+        'prefix' => '',
+        'driver'=>'\nb\cache\Redis'
+    ],
 
 
 ];

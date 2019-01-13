@@ -12,6 +12,7 @@ namespace controller;
 use bin\Config;
 use nb\Server;
 use util\Controller;
+use util\Redis;
 
 /**
  * Shared
@@ -23,21 +24,47 @@ use util\Controller;
  */
 class Shared extends Controller {
 
-    public function index() {
+    public function index($map='0000') {
         $this->assign('ak','DD205ad29d809f6a8cc23d82189745fa');
         $ip = Config::$o->ip;
         $this->assign('server',"ws://{$ip}:9503");
+        $this->assign('map',$map);
         $this->display('shared');
     }
 
-    public function post($lat,$lng) {
+
+    //注册我的地图信息，同时得到该地图的其它用户信息
+    public function enroll($map) {
         $serv = Server::driver();
+        $fd = $serv->fd;
+        Redis::set('fd:'.$fd,$map);
+
+        $data = Redis::hGetAll('map:'.$map);
+
+        //移除自己的位置信息
+        unset($data[$fd]);
+
+        $serv->push($fd,json_encode([
+            'action'=> 'reply-enroll',
+            'data'=>$data
+        ]));
+    }
+
+    //更新我的位置，并通知地图上的其它用户
+    public function post($map,$lat,$lng) {
+        $serv = Server::driver();
+        $mefd =  $serv->fd;
+
+        Redis::hmset('map:'.$map,[
+            $mefd=>$lng.':'.$lat,
+        ]);
+
         $conn_list = Server::driver()->getClientList(0, 100);
         if ($conn_list===false or count($conn_list) === 0) {
             //echo "finish\n";
             return;
         }
-        $mefd =  $serv->fd;
+
         foreach($conn_list as $fd) {
             if($mefd == $fd) {
                 break;
@@ -49,15 +76,6 @@ class Shared extends Controller {
                 'lng'=>$lng
             ]));
         }
-    }
-
-    protected function push($fd,$action,array $data=null) {
-        $redata = [
-            "action"=> 'push-'.$action,
-        ];
-        $data and $redata = array_merge($redata,$data);
-        b('push-'.$fd,$redata);
-        Server::driver()->push($fd,json_encode($redata));
     }
 
 }

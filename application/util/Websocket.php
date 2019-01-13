@@ -26,8 +26,24 @@ class Websocket extends Swoole {
 
 
     public function close($server, $fd) {
+        //删除位置缓存信息
+        $map = Redis::get('fd:'.$fd);
+        Redis::delete('fd:'.$fd);
 
+        if(!$map) {
+            return false;
+        }
 
+        Redis::hdel('map:'.$map,$fd);
+
+        //通知该地图其它用户有用户掉线
+        $data = Redis::hGetAll('map:'.$map);
+        foreach($data as $k=>$ll) {
+            $server->push($k,json_encode([
+                'action' => 'push-exit',
+                'fd'=>$fd
+            ]));
+        }
     }
 
     public function shutdown() {
