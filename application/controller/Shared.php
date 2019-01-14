@@ -55,23 +55,18 @@ class Shared extends Controller {
         $serv = Server::driver();
         $mefd =  $serv->fd;
 
+        $data = Redis::hGetAll('map:'.$map);
+
         Redis::hmset('map:'.$map,[
             $mefd=>$lng.':'.$lat,
         ]);
 
-        $conn_list = Server::driver()->getClientList(0, 100);
-        if ($conn_list===false or count($conn_list) === 0) {
-            //echo "finish\n";
-            return;
-        }
+        unset($data[$mefd]);
 
-        foreach($conn_list as $fd) {
-            if($mefd == $fd) {
-                break;
-            }
+        foreach($data as $fd=>$pos) {
             $serv->push($fd,json_encode([
                 'action'=> 'push-postion',
-                'fd'=>$fd,
+                'fd'=>$mefd,
                 'lat'=>$lat,
                 'lng'=>$lng
             ]));

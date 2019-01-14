@@ -45,9 +45,8 @@
     </style>
 </head>
 <body>
-<div id="container">1</div>
-<div id="me"></div>
-
+    <div id="container"></div>
+    <div id="me"></div>
 </body>
 <script src="https://cdn.nb.cx/jquery/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak={$ak}"></script>
@@ -77,9 +76,6 @@
             //map.clearOverlays();//清空原来的标注
             marker.setPosition(new BMap.Point(coor.longitude,coor.latitude));
         }
-        //$('#show').html('维度:'+coor.latitude+'经度'+coor.longitude);
-        //var timestamp = Date.parse(new Date());
-        //$('#time').html(timestamp);
         client.send({
             action:'shared/post',
             map:'{$map}',
@@ -102,7 +98,6 @@
 
     //获取我的地图信息
     client.reply('enroll',function (pos) {
-        console.log(pos);
         $.each(pos.data,function (k,v) {
             var point = v.split(":");
 
@@ -131,7 +126,6 @@
 
     //位置更新
     client.push('postion',function (pos) {
-        console.log(pos);
         if(markers[pos.fd]) {
             markers[pos.fd].setPosition(new BMap.Point(pos.lng,pos.lat));
         }
@@ -142,7 +136,7 @@
 
     //退出
     client.push('exit',function (pos) {
-        console.log(data);
+        map.removeOverlay(markers[pos.fd])
         markers[pos.fd] = false;
     })
 
@@ -175,16 +169,28 @@
         map.addControl(new BMap.MapTypeControl());
         map.enableScrollWheelZoom()
 
-        var myIcon = new BMap.Icon("https://api.map.baidu.com/img/markers.png", new BMap.Size(23, 25), {
-            offset: new BMap.Size(10, 25), // 指定定位位置
-            imageOffset: new BMap.Size(0, 0 - 10 * 25) // 设置图片偏移
+        //var myIcon = new BMap.Icon("https://api.map.baidu.com/img/markers.png", new BMap.Size(23, 25), {
+        //    offset: new BMap.Size(10, 25), // 指定定位位置
+        //    imageOffset: new BMap.Size(0, 0 - 10 * 25) // 设置图片偏移
+        //});
+
+
+        //显示数字序号
+        var label = new BMap.Label(name, {
+            offset : new BMap.Size(5, 4)
+        });
+        label.setStyle({
+            background:'none',color:'#fff',border:'none'//只要对label样式进行设置就可达到在标注图标上显示数字的效果
         });
 
-        var marker = new BMap.Marker(point,{icon:myIcon});
+        //,{icon:myIcon}
+        var marker = new BMap.Marker(point);
+        marker.setLabel(label);//显示地理名称
         //marker.setAnimation(BMAP_ANIMATION_BOUNCE);//跳动的动画
         map.addOverlay(marker);//标出所在地
         map.panTo(point);//地图中心移动
         marker.enableDragging();//设置可拖拽
+        marker['id'] = name;
         return marker;
     }
 
