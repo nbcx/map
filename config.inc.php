@@ -48,6 +48,9 @@ return [
         //异步任务处理配置
         //'task_worker_num'=>0,
         'enable_http'=>true,//启用内置的onRequest回调
+        //ssl
+        'ssl_cert_file'=>'home/bin/ssl/server.pem',
+        'ssl_key_file' =>'home/bin/ssl/privkey.pem'
     ],
 
     //缓存服务器配置

@@ -27,7 +27,7 @@ class Shared extends Controller {
     public function index($map='0000') {
         $this->assign('ak','DD205ad29d809f6a8cc23d82189745fa');
         $ip = Config::$o->ip;
-        $this->assign('server',"ws://{$ip}:9503");
+        $this->assign('server',"wss://{$ip}:9503");
         $this->assign('map',$map);
         $this->display('shared');
     }
