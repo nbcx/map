@@ -17,7 +17,7 @@ return [
 
     'default_index' => 'shared',
 
-    'ip'=>'127.0.0.1',
+    'addr'=>'wss://127.0.0.1',
 
     //数据库配置
     'dao' => [
@@ -49,6 +49,7 @@ return [
         //'task_worker_num'=>0,
         'enable_http'=>true,//启用内置的onRequest回调
         //ssl
+        'sock_type' => SWOOLE_SOCK_TCP | SWOOLE_SSL,
         'ssl_cert_file'=>'home/bin/ssl/server.pem',
         'ssl_key_file' =>'home/bin/ssl/privkey.pem'
     ],
