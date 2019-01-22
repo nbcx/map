@@ -30,8 +30,9 @@ class Index extends Controller {
 
     }
 
-    public function post($lng,$lat,$search=null) {
-        $suppliers = \model\Supplier::nearby($lng,$lat,$search);
+    public function post($lng, $lat, $start=1, $search=null) {
+        $rows=10;
+        $suppliers = \model\Supplier::nearby($lng,$lat,$start,$rows,$search);
         echo json_encode($suppliers);
     }
 

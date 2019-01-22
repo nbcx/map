@@ -12,63 +12,96 @@
     <style>
         html{height:100%}
         body{height:100%;margin:0;padding:0}
+        .anchorBL{display:none;}
         #container {height:100%}
-        #myPageTop {
+        #panel,#content {
             position:absolute;
             z-index:10;
-            top:0;
+            top:10px;
             left:50%;
             transform:translateX(-50%);
             background:#fff;
-            width:90%;
-            padding:20px
+            width:95%;
+            padding:10px;
+            border-radius: 4px;
+            box-sizing: border-box;
+            box-shadow: 1px 2px 1px rgba(0,0,0,.15);
         }
-        /*
-        #myPageTop #show{display:inline-block;text-align:center;padding:6px 20px;color:#fff;background:#a0c8ff;text-decoration:none}
-        #myPageTop #show{display:block;}
-        */
-        /*#myPageTop input{font-size:14px;padding:6px 8px;border:1px solid #ccc;outline:0}*/
-        /*.pageShow h3{margin:20px 0 10px}*/
-        /*#panel{position:absolute;background-color:#fff;max-height:90%;overflow-y:auto;top:10px;right:10px;width:280px}*/
-        .infowindow-content{padding:12px 8px;color:#fff;background:#ccc}
-        /*h3{font-family:microsoft yahei;!important}*/
-        .pageShow{display:none}
-        .anchorBL{
-            display:none;
+        #panel {
+            padding:5px;
         }
+        #panel span {
+            cursor: pointer
+        }
+        #content {
+            height: auto;
+            max-height: 80%;
+            top:70px;
+            overflow-y: scroll;
+            padding:10px 10px 5px 10px;
+        }
+        #content nav {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        .pagination {
+            margin: 0px 0;
+        }
+        @media (min-width: 768px) {
+            #panel,#content {
+                width:350px;
+                right:10px;
+                left:unset;
+                transform:unset;
+            }
+        }
+
+        #content .list{
+            display:block;
+            margin-top:10px;
+        }
+
+        #content .head{
+            padding:0;
+            width: 100%;
+            text-align: center;
+            display: block;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+        hr.line {
+            margin-top: 10px;
+            margin-bottom: 0;
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+
     </style>
-    <script src="https://cdn.nb.cx/jquery/jquery-1.9.1.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
     <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak={$ak}"></script>
     <script type="text/javascript" src="_pub_app.js?v=4"></script>
 </head>
 <body>
-<div id="myPageTop">
+<div id="panel">
     <div class="input-group">
         <input type="text" class="form-control" id="text">
-        <span class="input-group-addon" id="show" style="cursor: pointer">搜索</span>
-    </div>
-
-    <div class="pageShow">
-        <div style="margin-top: 20px" id="suppliers">
-            <!--
-                <hr />
-                <div class="media">
-                    <div class="media-body">
-                        <h4 class="media-heading">xxxx</h4>
-                        北京市朝阳区霄云路50号 距离市中心约7380米
-                    </div>
-                    <div class="media-right">
-                        <a href="#">
-                            500Km
-                        </a>
-                    </div>
-                </div>
-                -->
-        </div>
+        <span class="input-group-addon" id="show">搜索</span>
     </div>
 </div>
+<div id="content">
+    <div class="head">
+        <span class="visible-xs glyphicon glyphicon-chevron-up"></span>
+        <span class="hidden-xs"></span>
+    </div>
+    <div class="list">
+        <div style="margin-top: 20px" id="suppliers"></div>
+    </div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination pagination-sm" id="page"></ul>
+    </nav>
+</div>
 <div id="container"></div>
-<div id="panel"></div>
 <script>
     // 百度地图API功能
     var map = new BMap.Map("container");
@@ -121,11 +154,13 @@
         })
     }
     
-    function drawlist(suppliers) {
+    function drawlist(num,suppliers) {
+        $('#content .head .hidden-xs').html('共计'+num+'条');
         var htmlist = '';
+        var hr = '';
         for ( var i = 0; i <suppliers.length; i++){
             var sps = suppliers[i];
-            htmlist += '<hr />\n' +
+            htmlist += hr +
             '<div class="media">\n' +
             '   <div class="media-body">\n' +
             '        <h4 class="media-heading">'+sps.name+'</h4>\n' + sps.address +
@@ -134,30 +169,27 @@
             '         <span href="#">'+sps.dist+'</span>km\n' +
             '   </div>\n' +
             '</div>'
+            hr = '<hr class="line"/>\n';
         }
-        $('#suppliers').html(htmlist);
+        $('#content .list').html(htmlist);
     }
 
     localpos(function (lng,lat) {
         llng = lng;
         llat = lat;
         var point=new BMap.Point(lng,lat);
-        map.centerAndZoom(point,11);
+        map.centerAndZoom(point,10);
         map.addControl(new BMap.ScaleControl());
         map.addControl(new BMap.OverviewMapControl());
         map.addControl(new BMap.MapTypeControl());
         map.enableScrollWheelZoom()
 
-        //var myIcon = new BMap.Icon("https://api.map.baidu.com/img/markers.png", new BMap.Size(23, 25), {
-        //    offset: new BMap.Size(10, 25), // 指定定位位置
-        //    imageOffset: new BMap.Size(0, 0 - 10 * 25) // 设置图片偏移
-        //});
 
-        var myIcon = new BMap.Icon("_pub_img/circle.png", new BMap.Size(24, 24), {
+        var icon = new BMap.Icon("_pub_img/circle.png", new BMap.Size(24, 24), {
             offset: new BMap.Size(10, 25), // 指定定位位置
             imageOffset: new BMap.Size(0, 0) // 设置图片偏移
         });
-        var marker = new BMap.Marker(point,{icon:myIcon});
+        var marker = new BMap.Marker(point,{icon:icon});
         //marker.setAnimation(BMAP_ANIMATION_BOUNCE);//跳动的动画
         map.addOverlay(marker);//标出所在地
         map.panTo(point);//地图中心移动
@@ -171,8 +203,8 @@
 
         $.post("/index/post",{lat:lat,lng:lng},function(result){
             var suppliers =JSON.parse(result);
-            translate(suppliers);
-            drawlist(suppliers);
+            translate(suppliers[1]);
+            drawlist(suppliers[0],suppliers[1]);
         });
     })
 
@@ -186,18 +218,43 @@
         map.clearOverlays();//清空原来的标注
         $.post("/index/post",{lat:llat,lng:llng,search:$text},function(result){
             var suppliers =JSON.parse(result);
-            translate(suppliers);
-            drawlist(suppliers);
+            translate(suppliers[1]);
+            drawlist(suppliers[0],suppliers[1]);
             if($('.pageShow').css("display") == 'none') {
                 $('.pageShow').slideToggle();
             }
         });
     })
+
     $("#container").on('click',function(){
         if($('.pageShow').css("display") == 'block') {
             $('.pageShow').slideToggle();
         }
     })
+</script>
+<script type="text/javascript" src="_pub_jq-paginator.min.js"></script>
+<script>
+    $('#page').jqPaginator({
+        totalCounts: 100,
+        pageSize:10,
+        visiblePages: 8,
+        currentPage: 2,
+        first:'',last:'',
+        prev:'<li><a href="javascript:void(0)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>',
+        next:'<li><a href="javascript:void(0)" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>',
+        page:'<li><a href="javascript:void(0)">{{page}}</a></li>',
+        onPageChange: function (num, type) {
+            if(type == 'init') {
+                return;
+            }
+            num = 'start='+num;
+            var search = $('#search').val();
+            if(search) {
+                num += '&search='+search
+            }
+            window.location.href="/supplier?"+num;
+        }
+    });
 </script>
 </body>
 </html>

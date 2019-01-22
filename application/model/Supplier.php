@@ -21,7 +21,7 @@ use nb\Model;
  */
 class Supplier extends Model {
 
-    public static function nearby($lng,$lat,$search=null) {
+    public static function nearby($lng,$lat, $start=1, $rows=10,$search=null) {
         $er = 6366.564864;
         $dist=200; #Search radius (km)
 
@@ -36,7 +36,8 @@ class Supplier extends Model {
 
         $db->having("dist < ?",$dist);
         $db->orderby('dist');
-        return $db->fetchAll();
+        $db->limit($rows,$start);
+        return $db->paginate();
     }
 
 }

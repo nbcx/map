@@ -15,7 +15,7 @@ return [
     //是否开启调试
     'debug'=>true,
 
-    'default_index' => 'shared',
+    'default_index' => 'index',
 
     'addr'=>'wss://127.0.0.1',
 
@@ -24,7 +24,7 @@ return [
         'driver'	=> 'mysql',
         'host' 		=> 'data.nb.cx',
         'port' 		=> '3306',
-        'dbname'    => 'hymap',
+        'dbname'    => 'map',
         'user' 		=> 'dev',
         'pass' 		=> '123456',
         'connect'   => 'false',
@@ -49,7 +49,7 @@ return [
         //'task_worker_num'=>0,
         'enable_http'=>true,//启用内置的onRequest回调
         //ssl
-        'sock_type' => SWOOLE_SOCK_TCP | SWOOLE_SSL,
+        //'sock_type' => SWOOLE_SOCK_TCP | SWOOLE_SSL,
         'ssl_cert_file'=>'home/bin/ssl/server.pem',
         'ssl_key_file' =>'home/bin/ssl/privkey.pem'
     ],

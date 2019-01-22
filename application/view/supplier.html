@@ -62,5 +62,31 @@
         $("tbody input:checkbox").prop("checked",this.checked);
     })
 </script>
+<if condition="$num gt 10">
+    <script type="text/javascript" src="_pub_js/jq-paginator.min.js"></script>
+    <script>
+        $('#page').jqPaginator({
+            totalCounts: {$num},
+            pageSize:10,
+            visiblePages: 8,
+            currentPage: {$start},
+            first:'',last:'',
+            prev:'<li><a href="javascript:void(0)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>',
+            next:'<li><a href="javascript:void(0)" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>',
+            page:' <li><a href="javascript:void(0)">{{page}}</a></li>',
+            onPageChange: function (num, type) {
+                if(type == 'init') {
+                    return;
+                }
+                num = 'start='+num;
+                var search = $('#search').val();
+                if(search) {
+                    num += '&search='+search
+                }
+                window.location.href="/supplier?"+num;
+            }
+        });
+    </script>
+</if>
 </body>
 </html>
