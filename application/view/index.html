@@ -14,6 +14,12 @@
         body{height:100%;margin:0;padding:0}
         .anchorBL{display:none;}
         #container {height:100%}
+        .btn-tool {
+            position:absolute;
+            z-index:10;
+            bottom:20px;
+            left:20px;
+        }
         #panel,#content {
             position:absolute;
             z-index:10;
@@ -36,7 +42,7 @@
         #content {
             height: auto;
             max-height: 80%;
-            top:70px;
+            top:60px;
             overflow-y: scroll;
             padding:10px 10px 5px 10px;
         }
@@ -97,9 +103,30 @@
     <div class="list">
         <div style="margin-top: 20px" id="suppliers"></div>
     </div>
-    <nav aria-label="Page navigation">
+    <nav aria-label="Page navigation" class="text-center">
         <ul class="pagination pagination-sm" id="page"></ul>
     </nav>
+</div>
+<div class="btn-tool">
+    <if condition="$auth.have">
+        <p>
+            <a href="/supplier" class="btn btn-default" title="后台管理">
+                <span class="glyphicon glyphicon-asterisk"></span>
+            </a>
+        </p>
+        <div>
+            <a href="/login/post?action=out" class="btn btn-default" title="退出">
+                <span class="glyphicon glyphicon-log-out"></span>
+            </a>
+        </div>
+    <else />
+        <div>
+            <a href="/login" class="btn btn-default" title="登录">
+                <span class="glyphicon glyphicon-log-in"></span>
+            </a>
+        </div>
+    </if>
+
 </div>
 <div id="container"></div>
 <script>

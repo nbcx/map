@@ -33,6 +33,16 @@ class Framework extends Frame {
     }
 
     /**
+     * 当数据校验失败，会回调此方法
+     * @param $args 错误参数
+     * @param $msg  错误信息
+     */
+    public function validate($hint,$args) {
+        include __APP__ .'application/view/hint.html';
+        quit();
+    }
+
+    /**
      * 解析websocket,tcp的路由
      * @param $data 客服端发送数据
      * @return string

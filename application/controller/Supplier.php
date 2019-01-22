@@ -21,8 +21,27 @@ use util\Administration;
  */
 class Supplier extends Administration {
 
-    public function index() {
-        $suppliers = \model\Supplier::fetchs('deleted=0');
+    public $_rule = [
+        'sticking'  =>  'require',
+        'press'=>  'require',
+        'tile'=>  'require',
+        'longitude'=>'require',
+        'latitude'=>'require'
+    ];
+
+    public $_message  =   [
+        'sticking.require' => '请填写粘箱机台数',
+        'press.require' => '请填写印刷机台数',
+        'tile.require' => '请填写瓦线台数',
+        'longitude.require'=>'请填写经纬度',
+        'latitude.require'=>'请填写经纬度'
+    ];
+
+    public function index($start=1,$search='') {
+        list($num,$suppliers) = \model\Supplier::admin(10,$start, $search);
+        $this->assign('search',$search);
+        $this->assign('num',$num);
+        $this->assign('start',$start);
         $this->assign('suppliers',$suppliers);
         $this->display('supplier');
     }

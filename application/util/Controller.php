@@ -21,16 +21,14 @@ use nb\Request;
  */
 class Controller extends \nb\Controller {
 
-    use Assist;
-
-    /**
-     * 设置布局
-     * @param $name
-     * @param string $replace
-     */
-    protected function layout($name, $replace = '') {
-        $this->view->layout($name,$replace);
+    public function __before() {
+        $this->assign('auth',Auth::init());
+        return true;
     }
 
+    protected function tips($hint) {
+        include __APP__ .'application/view/hint.html';
+        quit();
+    }
 
 }

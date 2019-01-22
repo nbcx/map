@@ -27,7 +27,7 @@ class Index extends Controller {
 
     //供应商详情
     public function details() {
-
+        echo md5('123456');
     }
 
     public function post($lng, $lat, $start=1, $search=null) {

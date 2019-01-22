@@ -21,6 +21,14 @@ use nb\Model;
  */
 class Supplier extends Model {
 
+    public static function admin($rows= 0,$start= 0,$search='') {
+        $db = self::dao();
+        $db->where('deleted=0');
+        $search and $db->like('name',$search);
+        $db->orderby('name');
+        return self::paginate($rows, $start);
+    }
+
     public static function nearby($lng,$lat, $start=1, $rows=10,$search=null) {
         $er = 6366.564864;
         $dist=200; #Search radius (km)
