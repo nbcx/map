@@ -6,7 +6,7 @@
     "framework",
     "nb",
     "swoole",
-    "poker"
+    "map"
   ],
   "minimum-stability": "dev",
   "require": {
