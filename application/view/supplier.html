@@ -11,7 +11,7 @@
 <div class="container">
 
     <div class="col-12">
-        <h1 class="page-header">供应商列表</h1>
+        <h1 class="page-header">商家列表</h1>
         <form method="post" action="/supplier/post?action=del">
             <div class="tool">
                 <a class="btn btn-success" href="/supplier/add"><span class="glyphicon glyphicon-plus"></span> 添加</a>
@@ -33,9 +33,6 @@
                         <td>公司名</td>
                         <td>联系人</td>
                         <td>联系电话</td>
-                        <td align="center">瓦线</td>
-                        <td align="center">印刷机</td>
-                        <td align="center">粘箱机</td>
                         <td>所在省市</td>
                         <td width="20"></td>
                     </tr>
@@ -47,9 +44,6 @@
                             <td>{$v.name}</td>
                             <td>{$v.linkman}</td>
                             <td>{$v.phone}</td>
-                            <td align="center">{$v.tile}</td>
-                            <td align="center">{$v.press}</td>
-                            <td align="center">{$v.sticking}</td>
                             <td>{$v.address}</td>
                             <td><a href="/supplier/edit?id={$v.id}" class="btn btn-xs btn-primary btn-dragsort"><span class="glyphicon glyphicon-pencil"></span></a></td>
                         </tr>
