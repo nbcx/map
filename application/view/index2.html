@@ -77,6 +77,7 @@
             border-top: 1px solid #eee;
             display:block;
             padding-top:10px;
+            z-index: 1000;
         }
 
         #content .head{
@@ -84,7 +85,7 @@
             width: 100%;
             text-align: center;
             display: block;
-            padding-bottom: 6px;
+            padding-bottom: 8px;
         }
         hr.line {
             margin-top: 10px;
@@ -121,7 +122,7 @@
                 <span class="glyphicon glyphicon-log-out"></span>
             </a>
         </p>
-        <else />
+    <else />
         <p>
             <a href="/login" class="btn btn-default" title="登录">
                 <span class="glyphicon glyphicon-log-in"></span>
@@ -252,6 +253,16 @@
         });
     }
 
+    function h4click(i) {
+        if(markers[i].V.click) {
+            markers[i].V.click()
+        }
+        else {
+            alert(2);
+        }
+        //$(markers[i].V).trigger('click');
+
+    }
     //商家列表渲染函数
     function drawlist(num,suppliers) {
         $('#content .head .hidden-xs').html('共计'+num+'条');
@@ -265,7 +276,7 @@
                 '      <a class="no-'+(i+1)+'"></a>\n' +
                 '   </div>'+
                 '   <div class="media-body">\n' +
-                '        <h4 id="'+sps.id+'" class="media-heading" marker="'+i+'">'+sps.name+
+                '        <h4 class="media-heading"><a href="javascript:h4click('+i+')" >'+sps.name+'</a>'+
                 '           <div class="pull-right">\n' +
                 '               <small href="#">'+sps.dist+'km</small>\n' +
                 '           </div>\n' +
@@ -363,11 +374,11 @@
         $('#content .list').slideToggle();
     });
 
-    $("#content").on("click","h4",function(){
-        var i =  $(this).attr("marker");;
-        markers[i].V.click();
-    });
-
+    //$("#content").on("click","h4",function(){
+    //    var i =  $(this).attr("marker");;
+    //    markers[i].V.click();
+    //});
+    
     $('#postion-btn').click(function () {
         var text = $('#postion').val();
         localSearch.search(text);
