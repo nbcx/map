@@ -9,7 +9,9 @@
  */
 namespace controller;
 
+use nb\Session;
 use util\Administration;
+use util\Auth;
 
 /**
  * Supplier
@@ -22,17 +24,11 @@ use util\Administration;
 class Supplier extends Administration {
 
     public $_rule = [
-        'sticking'  =>  'require',
-        'press'=>  'require',
-        'tile'=>  'require',
         'longitude'=>'require',
         'latitude'=>'require'
     ];
 
     public $_message  =   [
-        'sticking.require' => '请填写粘箱机台数',
-        'press.require' => '请填写印刷机台数',
-        'tile.require' => '请填写瓦线台数',
         'longitude.require'=>'请填写经纬度',
         'latitude.require'=>'请填写经纬度'
     ];
@@ -51,15 +47,25 @@ class Supplier extends Administration {
     }
 
     public function edit($id) {
+        Session::set('_s_page',$this->form(['start','search']));
+
         $supplier = \model\Supplier::findId($id);
         $this->assign('supplier',$supplier);
         $this->display('edit');
     }
 
     public function post($action) {
+        if(!Auth::init()->power('supplier/post-'.$action)) {
+            $this->tips('无权限执行此操作！');
+            return true;
+        }
         \service\Supplier::run($action,function ($msg) {
-            ed('msg:'.$msg);
+            $this->tips($msg);
         });
+        $page = Session::pull('_s_page');
+        if($page) {
+            redirect("/supplier?start={$page['start']}&search={$page['search']}");
+        }
         redirect('/supplier');
     }
 

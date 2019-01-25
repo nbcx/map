@@ -35,7 +35,7 @@ composer install
     'driver'	=> 'mysql',
     'host' 		=> 'data.nb.cx',
     'port' 		=> '3306',
-    'dbname'    => 'hymap', //数据库名子
+    'dbname'    => 'map', //数据库名子
     'user' 		=> 'dev',  数据库用户名
     'pass' 		=> '123456', 数据库密码
     'connect'   => 'false',
@@ -63,7 +63,7 @@ server {
     }
 
     location ~ .*\.(svg|woff2|map|html|woff|ttf|ico|css|js|gif|jpg|jpeg|png|bmp|swf)$ {
-        root /path/to/hy/;
+        root /path/to/map/;
         expires 90d;
     }
 }

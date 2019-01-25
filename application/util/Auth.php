@@ -36,6 +36,32 @@ class Auth extends User {
     }
 
 
+    public function power($action=null) {
+        //非后台用户，无权限
+        if(!$this->isadmin) {
+            return false;
+        }
+
+        if(!$this->type) {
+            return true;
+        }
+
+        $power = load('power');
+
+        $power = $power[$this->type];
+
+        $this->power = $power;
+
+        if($action === null) {
+            $router = Router::driver();
+            $action =$router->controller.'/'.$router->function;
+        }
+
+        if(in_array(strtolower($action),$power)) {
+            return true;
+        }
+        return false;
+    }
 
 
 

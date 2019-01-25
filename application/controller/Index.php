@@ -25,9 +25,13 @@ class Index extends Controller {
         $this->display('index');
     }
 
-    //供应商详情
-    public function details() {
-        echo md5('123456');
+    //商家详情
+    public function details($id) {
+        $supplier = \model\Supplier::findId($id);
+        $this->assign('supplier',$supplier);
+
+        $this->assign('system',\model\System::findkv('name,value'));
+        $this->display('details');
     }
 
     public function post($lng, $lat, $start=1, $search=null) {

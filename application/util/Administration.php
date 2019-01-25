@@ -23,10 +23,16 @@ use nb\Router;
 class Administration extends Controller {
 
     public function __before() {
-        if(Auth::init()->empty) {
+        $auth = Auth::init();
+        if($auth->empty) {
             redirect('/login');
             return false;
         }
+
+        if(!$auth->power()) {
+            $this->tips('无权限执行此操作！');
+        }
+        $this->assign('auth',$auth);
         $this->assign('system',\model\System::findkv('name,value'));
         $this->assign('conf',Config::$o);
         $this->assign('router',Router::driver());

@@ -25,13 +25,13 @@ class Supplier extends Model {
         $db = self::dao();
         $db->where('deleted=0');
         $search and $db->like('name',$search);
-        $db->orderby('name');
+        $db->orderby('id desc');
         return self::paginate($rows, $start);
     }
 
     public static function nearby($lng,$lat, $start=1, $rows=10,$search=null) {
         $er = 6366.564864;
-        $dist=200; #Search radius (km)
+        $dist= \model\System::findkv('name,value')->distance; #Search radius (km)
 
         $lat_length = 111.132944;//20003.93/180; #lat length
 

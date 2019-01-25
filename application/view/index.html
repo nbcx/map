@@ -3,10 +3,10 @@
 <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>附近</title>
+    <title>附近 - {$system.name}</title>
     <!-- Bootstrap core CSS -->
     <link href="https://cdn.nb.cx/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="_pub_index.css" rel="stylesheet">
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <link href="https://cdn.nb.cx/bootstrap/3.3.7/ie10-viewport-bug-workaround.css" rel="stylesheet">
     <style>
@@ -20,7 +20,10 @@
             bottom:20px;
             left:20px;
         }
-        #panel,#content {
+        .btn-tool p {
+            margin: 0 0 7px;
+        }
+        #panel,#content,#details {
             position:absolute;
             z-index:10;
             top:10px;
@@ -39,7 +42,7 @@
         #panel span {
             cursor: pointer
         }
-        #content {
+        #content,#details {
             height: auto;
             max-height: 80%;
             top:60px;
@@ -51,18 +54,25 @@
             padding-top: 10px;
             border-top: 1px solid #eee;
         }
+        #content h4 {
+            color: #428bca;
+            cursor: pointer;
+        }
         .pagination {
             margin: 0px 0;
         }
         @media (min-width: 768px) {
-            #panel,#content {
+            #panel,#content,#details {
                 width:350px;
                 right:10px;
                 left:unset;
                 transform:unset;
             }
         }
-
+        #details {
+            padding:0;
+            display: none;
+        }
         #content .list{
             display:block;
             margin-top:10px;
@@ -82,18 +92,42 @@
             border: 0;
             border-top: 1px solid #eee;
         }
-
     </style>
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.nb.cx/jquery/jquery-1.12.4.min.js"></script>
     <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak={$ak}"></script>
     <script type="text/javascript" src="_pub_app.js?v=4"></script>
 </head>
 <body>
 <div id="panel">
     <div class="input-group">
-        <input type="text" class="form-control" id="text">
+        <input type="text" class="form-control" id="text" placeholder="输入附近店铺名称">
         <span class="input-group-addon" id="show">搜索</span>
     </div>
+</div>
+<div class="btn-tool">
+    <p>
+        <button class="btn btn-default" title="我的位置" data-toggle="modal" data-target="#postion-modal">
+            <span class="glyphicon glyphicon-screenshot"></span>
+        </button>
+    </p>
+    <if condition="$auth.have">
+        <p>
+            <a href="/supplier" class="btn btn-default" title="后台管理">
+                <span class="glyphicon glyphicon-user"></span>
+            </a>
+        </p>
+        <p>
+            <a href="/login/post?action=out" class="btn btn-default" title="退出">
+                <span class="glyphicon glyphicon-log-out"></span>
+            </a>
+        </p>
+    <else />
+        <p>
+            <a href="/login" class="btn btn-default" title="登录">
+                <span class="glyphicon glyphicon-log-in"></span>
+            </a>
+        </p>
+    </if>
 </div>
 <div id="content">
     <div class="head">
@@ -107,80 +141,114 @@
         <ul class="pagination pagination-sm" id="page"></ul>
     </nav>
 </div>
-<div class="btn-tool">
-    <if condition="$auth.have">
-        <p>
-            <a href="/supplier" class="btn btn-default" title="后台管理">
-                <span class="glyphicon glyphicon-asterisk"></span>
-            </a>
-        </p>
-        <div>
-            <a href="/login/post?action=out" class="btn btn-default" title="退出">
-                <span class="glyphicon glyphicon-log-out"></span>
-            </a>
-        </div>
-    <else />
-        <div>
-            <a href="/login" class="btn btn-default" title="登录">
-                <span class="glyphicon glyphicon-log-in"></span>
-            </a>
-        </div>
-    </if>
+<div id="details"></div>
 
-</div>
 <div id="container"></div>
+<!-- Modal -->
+<div class="modal fade" id="postion-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">我的位置</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="postion">
+                </div>
+                <button id="postion-btn" type="button" class="btn btn-primary btn-block">修改我的位置</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.nb.cx/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_pub_jq-paginator.min.js"></script>
 <script>
     // 百度地图API功能
     var map = new BMap.Map("container");
 
-    var llng,llat,search='';
+    var llng,llat,search='',markers;
+
+    var icon = new BMap.Icon("_pub_circle.png", new BMap.Size(24, 24), {
+        offset: new BMap.Size(10, 25), // 指定定位位置
+        imageOffset: new BMap.Size(0, 0) // 设置图片偏移
+    });
+
+    function back() {
+        $('#details').slideToggle();
+        $('#content').slideToggle();
+    }
+
+    function details(id) {
+        $("#details").load('/index/details?id='+id);
+        if($('#content').css("display") == 'block') {
+            $('#content').slideToggle();
+        }
+        if($('#details').css("display") == 'none') {
+            $('#details').slideToggle();
+        }
+    }
 
     function translate(suppliers) {
         var points = [];
         for ( var i = 0; i <suppliers.length; i++){
             points[i] =new BMap.Point(suppliers[i].longitude,suppliers[i].latitude)
-            //points.push(new BMap.Point(suppliers[i].longitude,suppliers[i].latitude))
         }
-        console.log(points);
         //坐标转换完之后的回调函数
         var convertor = new BMap.Convertor();
         convertor.translate(points, 1, 3, function (data){
             if(data.status === 0) {
+                markers = [];
                 for (var i = 0; i < data.points.length; i++) {
                     var marker=new BMap.Marker(data.points[i]);
-
                     //显示数字序号
-                    var label = new BMap.Label(i+1, {
-                        offset : new BMap.Size(5, 4)
-                    });
-                    label.setStyle({
-                        background:'none',color:'#fff',border:'none'//只要对label样式进行设置就可达到在标注图标上显示数字的效果
-                    });
-                    marker.setLabel(label);//显示地理名称 a 
-
-                    var html='<a href="https://nb.cx" target="_blank">nb</a>'+suppliers[i].name;
-                    var infoWindow = new BMap.InfoWindow(html);//创建窗口信息
-                    marker.infoWindow=infoWindow;//给当前标注新增一个属性以便保存窗口信息infoWindow
+                    var label = new BMap.Label(i+1, {offset : new BMap.Size(5, 4)});
+                    //只要对label样式进行设置就可达到在标注图标上显示数字的效果
+                    label.setStyle({background:'none',color:'#fff',border:'none'});
+                    marker.setLabel(label);//显示地理名称
+                    var html='<a>'+suppliers[i].name+'</a><br/>'+suppliers[i].dist+ 'km<br/>'+suppliers[i].address;
+                    marker.infoWindow = new BMap.InfoWindow(html);//创建窗口信息
+                    marker.id = suppliers[i].id;
                     //添加标注的点击事件回调
                     marker.addEventListener("click", function(e){
                         //点击标注时，打开改标注对应的回调信息
                         this.openInfoWindow(e.target.infoWindow);
-                        //如果没猜错，你原来在这里的代码应该如下：
-                        //this.openInfoWindow(infoWindow);
-                        //那样就会导致每次标注点击后，弹出的窗口信息都是最后一次循环的infoWindow。
-                        //因为在click的时候只会去找infoWindow这个变量值，而你的click肯定是在所有循环的
-                        //标注都产生完之后，此时infoWindow变量已经被赋值成了最后一次循环的值。
+                        details(e.target.id);
                     });
-                    map.addOverlay(marker);//添加标注到地图
-
-
-                    //bm.addOverlay(marker);
-                    map.setCenter(data.points[i]);
+                    map.addOverlay(marker);
+                    markers[i] = marker
+                    //map.setCenter(data.points[i]);
                 }
             }
         })
     }
-    
+
+    function page(total) {
+        $('#content nav').show();
+        $('#page').jqPaginator({
+            totalCounts: parseInt(total),
+            pageSize:10,
+            visiblePages: 8,
+            currentPage: 1,
+            first:'',last:'',
+            prev:'<li><a href="javascript:void(0)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>',
+            next:'<li><a href="javascript:void(0)" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>',
+            page:' <li><a href="javascript:void(0)">{{page}}</a></li>',
+            onPageChange: function (num, type) {
+                if(type == 'init') {
+                    return;
+                }
+                map.clearOverlays();//清空原来的标注
+                $.post("/index/post",{lat:llat,lng:llng,start:num},function(result){
+                    var suppliers =JSON.parse(result);
+                    drawlist(suppliers[0],suppliers[1]);
+                    translate(suppliers[1]);
+                });
+            }
+        });
+    }
+
     function drawlist(num,suppliers) {
         $('#content .head .hidden-xs').html('共计'+num+'条');
         var htmlist = '';
@@ -188,22 +256,25 @@
         for ( var i = 0; i <suppliers.length; i++){
             var sps = suppliers[i];
             htmlist += hr +
-            '<div class="media">\n' +
-            '   <div class="media-body">\n' +
-            '        <h4 class="media-heading">'+sps.name+'</h4>\n' + sps.address +
-            '   </div>\n' +
-            '   <div class="media-right">\n' +
-            '         <span href="#">'+sps.dist+'</span>km\n' +
-            '   </div>\n' +
-            '</div>'
+                '<div class="media">\n' +
+                '   <div class="media-left">\n' +
+                '      <a class="no-'+(i+1)+'"></a>\n' +
+                '   </div>'+
+                '   <div class="media-body">\n' +
+                '        <h4 id="'+sps.id+'" class="media-heading" marker="'+i+'">'+sps.name+
+                '           <div class="pull-right">\n' +
+                '               <small href="#">'+sps.dist+'km</small>\n' +
+                '           </div>\n' +
+                '        </h4>\n' + sps.address +
+                '   </div>\n' +
+                '</div>'
             hr = '<hr class="line"/>\n';
         }
         $('#content .list').html(htmlist);
     }
 
     localpos(function (lng,lat) {
-        llng = lng;
-        llat = lat;
+        llng = lng;llat = lat;
         var point=new BMap.Point(lng,lat);
         map.centerAndZoom(point,10);
         map.addControl(new BMap.ScaleControl());
@@ -211,28 +282,62 @@
         map.addControl(new BMap.MapTypeControl());
         map.enableScrollWheelZoom()
 
-        var icon = new BMap.Icon("_pub_circle.png", new BMap.Size(24, 24), {
-            offset: new BMap.Size(10, 25), // 指定定位位置
-            imageOffset: new BMap.Size(0, 0) // 设置图片偏移
-        });
         var marker = new BMap.Marker(point,{icon:icon});
         //marker.setAnimation(BMAP_ANIMATION_BOUNCE);//跳动的动画
         map.addOverlay(marker);//标出所在地
         map.panTo(point);//地图中心移动
         marker.enableDragging();
 
-        //var point = new BMap.Point(longitudeValue,latitudeValue);//用所定位的经纬度查找所在地省市街道等信息
-        //var gc = new BMap.Geocoder();
-        //gc.getLocation(point, function(rs){
-        //    console.log(rs.address);//地址信息
-        //});
+        //用所定位的经纬度查找所在地省市街道等信息
+        var gc = new BMap.Geocoder();
+        gc.getLocation(point, function(rs){
+            $('#postion').val(rs.address);
+        });
 
         $.post("/index/post",{lat:lat,lng:lng},function(result){
             var suppliers =JSON.parse(result);
             translate(suppliers[1]);
             drawlist(suppliers[0],suppliers[1]);
+            if(suppliers[0] > 10) {
+                page(suppliers[0]);
+            }
+            else {
+                $('#content nav').hide();
+            }
         });
     })
+
+    var localSearch = new BMap.LocalSearch(map);
+    localSearch.setSearchCompleteCallback(function (result) {
+        var poi = result.getPoi(0);
+        if(!poi) {
+            alert('该地址无法定位，请重新填写！');
+            return;
+        }
+        map.clearOverlays();//清空原来的标注
+        llng = poi.point.lng;
+        llat = poi.point.lat;
+        map.centerAndZoom(poi.point, 10);
+        map.addOverlay(new BMap.Marker(poi.point,{icon:icon}));
+        map.panTo(poi.point);//地图中心移动
+        $.post("/index/post",{lat:poi.point.lat,lng:poi.point.lng},function(result){
+            var suppliers =JSON.parse(result);
+            drawlist(suppliers[0],suppliers[1]);
+            translate(suppliers[1]);
+            if(suppliers[0] > 10) {
+                page(suppliers[0]);
+            }
+            else {
+                $('#content nav').hide();
+            }
+        });
+
+        if($('#content').css("display") == 'none') {
+            $('#details').slideToggle();
+            $('#content').slideToggle();
+        }
+        $('#postion-modal').modal('toggle')
+    });
 
     $("#show").on('click',function(){
         $text = $('#text').val();
@@ -242,6 +347,10 @@
         }
         search = $text;
         map.clearOverlays();//清空原来的标注
+        var point=new BMap.Point(llng,llat);
+        var marker = new BMap.Marker(point,{icon:icon});
+        map.addOverlay(marker);//标出所在地
+        //map.panTo(point);//地图中心移动
         $.post("/index/post",{lat:llat,lng:llng,search:$text},function(result){
             var suppliers =JSON.parse(result);
             translate(suppliers[1]);
@@ -252,35 +361,25 @@
         });
     })
 
-    $("#container").on('click',function(){
-        if($('.pageShow').css("display") == 'block') {
-            $('.pageShow').slideToggle();
-        }
+    $("#content").on("click",".visible-xs",function(){
+        $(this).toggleClass("glyphicon-chevron-down");
+        $('#content .list').slideToggle();
+    });
+
+    $("#content").on("click","h4",function(){
+        var i =  $(this).attr("marker");;
+        markers[i].V.click();
+    });
+    
+    $('#postion-btn').click(function () {
+        var text = $('#postion').val();
+        localSearch.search(text);
+    })
+
+    $('#postion-modal').on('shown.bs.modal', function () {
+        map.panTo(new BMap.Point(llng,llat));//地图中心移动
     })
 </script>
-<script type="text/javascript" src="_pub_jq-paginator.min.js"></script>
-<script>
-    $('#page').jqPaginator({
-        totalCounts: 100,
-        pageSize:10,
-        visiblePages: 8,
-        currentPage: 2,
-        first:'',last:'',
-        prev:'<li><a href="javascript:void(0)" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>',
-        next:'<li><a href="javascript:void(0)" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>',
-        page:'<li><a href="javascript:void(0)">{{page}}</a></li>',
-        onPageChange: function (num, type) {
-            if(type == 'init') {
-                return;
-            }
-            num = 'start='+num;
-            var search = $('#search').val();
-            if(search) {
-                num += '&search='+search
-            }
-            window.location.href="/supplier?"+num;
-        }
-    });
-</script>
+
 </body>
 </html>

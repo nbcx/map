@@ -22,6 +22,7 @@ use nb\Request;
 class Controller extends \nb\Controller {
 
     public function __before() {
+        $this->assign('system',\model\System::findkv('name,value'));
         $this->assign('auth',Auth::init());
         return true;
     }

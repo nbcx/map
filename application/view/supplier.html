@@ -45,7 +45,7 @@
                             <td>{$v.linkman}</td>
                             <td>{$v.phone}</td>
                             <td>{$v.address}</td>
-                            <td><a href="/supplier/edit?id={$v.id}" class="btn btn-xs btn-primary btn-dragsort"><span class="glyphicon glyphicon-pencil"></span></a></td>
+                            <td><a href="/supplier/edit?id={$v.id}&start={$start}&search={$search}" class="btn btn-xs btn-primary btn-dragsort"><span class="glyphicon glyphicon-pencil"></span></a></td>
                         </tr>
                     </volist>
                 </tbody>
@@ -74,6 +74,13 @@
     $('.del').click(function() {
         $("tbody input:checkbox").prop("checked",this.checked);
     })
+    $('#btn-search').click(function () {
+        var search = $('#search').val();
+        if(search) {
+            search = "?search="+search;
+        }
+        window.location.href="/supplier"+search;
+    });
 </script>
 <if condition="$num gt 10">
     <script type="text/javascript" src="_pub_jq-paginator.min.js"></script>

@@ -1,0 +1,21 @@
+<?php
+//路由配置
+return [
+    '1'=>[
+        'supplier/index',
+        'supplier/add',
+        'supplier/edit',
+        'admin/profile',
+        'supplier/post',
+        'supplier/post-add',
+        'supplier/post-edit',
+    ],
+    '2'=>[
+        'supplier/index',
+        'supplier/add',
+        'supplier/edit',
+        'admin/profile',
+        'supplier/post',
+        'supplier/post-add',
+    ]
+];
