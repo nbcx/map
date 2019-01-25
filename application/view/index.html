@@ -84,7 +84,7 @@
             width: 100%;
             text-align: center;
             display: block;
-            padding-bottom: 6px;
+            padding-bottom: 8px;
         }
         hr.line {
             margin-top: 10px;
@@ -252,6 +252,9 @@
         });
     }
 
+    function h4click(i) {
+        markers[i].V.click();
+    }
     //商家列表渲染函数
     function drawlist(num,suppliers) {
         $('#content .head .hidden-xs').html('共计'+num+'条');
@@ -265,7 +268,7 @@
                 '      <a class="no-'+(i+1)+'"></a>\n' +
                 '   </div>'+
                 '   <div class="media-body">\n' +
-                '        <h4 id="'+sps.id+'" class="media-heading" marker="'+i+'">'+sps.name+
+                '        <h4 onclick="h4click('+i+')" class="media-heading">'+sps.name+
                 '           <div class="pull-right">\n' +
                 '               <small href="#">'+sps.dist+'km</small>\n' +
                 '           </div>\n' +
@@ -363,10 +366,10 @@
         $('#content .list').slideToggle();
     });
 
-    $("#content").on("click","h4",function(){
-        var i =  $(this).attr("marker");;
-        markers[i].V.click();
-    });
+    //$("#content").on("click","h4",function(){
+    //    var i =  $(this).attr("marker");;
+    //    markers[i].V.click();
+    //});
     
     $('#postion-btn').click(function () {
         var text = $('#postion').val();
