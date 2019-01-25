@@ -48,6 +48,7 @@
             top:60px;
             overflow-y: scroll;
             padding:10px 10px 5px 10px;
+            display: none;
         }
         #content nav {
             margin-top: 10px;
@@ -71,11 +72,11 @@
         }
         #details {
             padding:0;
-            display: none;
         }
-        #content .list{
+        #content .list {
+            border-top: 1px solid #eee;
             display:block;
-            margin-top:10px;
+            padding-top:10px;
         }
 
         #content .head{
@@ -83,8 +84,7 @@
             width: 100%;
             text-align: center;
             display: block;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
         hr.line {
             margin-top: 10px;
@@ -180,6 +180,7 @@
         $('#content').slideToggle();
     }
 
+    //根据商家ID显示商家详情
     function details(id) {
         $("#details").load('/index/details?id='+id);
         if($('#content').css("display") == 'block') {
@@ -190,6 +191,7 @@
         }
     }
 
+    //商家地图标记渲染函数
     function translate(suppliers) {
         var points = [];
         for ( var i = 0; i <suppliers.length; i++){
@@ -224,6 +226,7 @@
         })
     }
 
+    //分页
     function page(total) {
         $('#content nav').show();
         $('#page').jqPaginator({
@@ -249,6 +252,7 @@
         });
     }
 
+    //商家列表渲染函数
     function drawlist(num,suppliers) {
         $('#content .head .hidden-xs').html('共计'+num+'条');
         var htmlist = '';
@@ -273,6 +277,26 @@
         $('#content .list').html(htmlist);
     }
 
+    //Post回调函数
+    function postCallBack(result) {
+        var suppliers =JSON.parse(result);
+        translate(suppliers[1]);
+        drawlist(suppliers[0],suppliers[1]);
+        if(suppliers[0] > 10) {
+            page(suppliers[0]);
+        }
+        else {
+            $('#content nav').hide();
+        }
+        if(suppliers[0] > 0 ) {
+            $('#content').css("display") == 'none' && $('#content').slideToggle();
+            $('#content .list').show();
+        }
+        else {
+            $('#content .list').hide();
+        }
+    }
+
     localpos(function (lng,lat) {
         llng = lng;llat = lat;
         var point=new BMap.Point(lng,lat);
@@ -294,17 +318,7 @@
             $('#postion').val(rs.address);
         });
 
-        $.post("/index/post",{lat:lat,lng:lng},function(result){
-            var suppliers =JSON.parse(result);
-            translate(suppliers[1]);
-            drawlist(suppliers[0],suppliers[1]);
-            if(suppliers[0] > 10) {
-                page(suppliers[0]);
-            }
-            else {
-                $('#content nav').hide();
-            }
-        });
+        $.post("/index/post",{lat:lat,lng:lng},postCallBack);
     })
 
     var localSearch = new BMap.LocalSearch(map);
@@ -320,17 +334,7 @@
         map.centerAndZoom(poi.point, 10);
         map.addOverlay(new BMap.Marker(poi.point,{icon:icon}));
         map.panTo(poi.point);//地图中心移动
-        $.post("/index/post",{lat:poi.point.lat,lng:poi.point.lng},function(result){
-            var suppliers =JSON.parse(result);
-            drawlist(suppliers[0],suppliers[1]);
-            translate(suppliers[1]);
-            if(suppliers[0] > 10) {
-                page(suppliers[0]);
-            }
-            else {
-                $('#content nav').hide();
-            }
-        });
+        $.post("/index/post",{lat:poi.point.lat,lng:poi.point.lng},postCallBack);
 
         if($('#content').css("display") == 'none') {
             $('#details').slideToggle();
@@ -342,7 +346,7 @@
     $("#show").on('click',function(){
         $text = $('#text').val();
         if($text == search) {
-            $('.pageShow').slideToggle();
+            //搜素关键字无改变，则不发送请求
             return;
         }
         search = $text;
@@ -351,14 +355,7 @@
         var marker = new BMap.Marker(point,{icon:icon});
         map.addOverlay(marker);//标出所在地
         //map.panTo(point);//地图中心移动
-        $.post("/index/post",{lat:llat,lng:llng,search:$text},function(result){
-            var suppliers =JSON.parse(result);
-            translate(suppliers[1]);
-            drawlist(suppliers[0],suppliers[1]);
-            if($('.pageShow').css("display") == 'none') {
-                $('.pageShow').slideToggle();
-            }
-        });
+        $.post("/index/post",{lat:llat,lng:llng,search:$text},postCallBack);
     })
 
     $("#content").on("click",".visible-xs",function(){
