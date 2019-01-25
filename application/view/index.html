@@ -254,14 +254,8 @@
     }
 
     function h4click(i) {
-        if(markers[i].V) {
-            alert(1)
-            markers[i].V.click()
-        }
-        else {
-            alert(2)
-        }
-
+        $(markers[i].V).trigger('click');
+        //markers[i].V.click()
     }
     //商家列表渲染函数
     function drawlist(num,suppliers) {
