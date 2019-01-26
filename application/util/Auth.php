@@ -42,6 +42,7 @@ class Auth extends User {
             return false;
         }
 
+        //系统管理员拥有所有权限
         if(!$this->type) {
             return true;
         }

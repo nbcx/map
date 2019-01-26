@@ -43,7 +43,7 @@ class Admin extends Administration {
 
     public function post($action) {
         \service\User::run($action,function ($msg) {
-            ed($msg);
+            $this->tips($msg);
         });
         redirect('/admin');
     }

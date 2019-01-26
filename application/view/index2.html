@@ -261,7 +261,6 @@
             alert(2);
         }
         //$(markers[i].V).trigger('click');
-
     }
     //商家列表渲染函数
     function drawlist(num,suppliers) {
@@ -362,9 +361,7 @@
         }
         search = $text;
         map.clearOverlays();//清空原来的标注
-        var point=new BMap.Point(llng,llat);
-        var marker = new BMap.Marker(point,{icon:icon});
-        map.addOverlay(marker);//标出所在地
+        map.addOverlay(new BMap.Marker(new BMap.Point(llng,llat),{icon:icon}));//标出所在地
         //map.panTo(point);//地图中心移动
         $.post("/index/post",{lat:llat,lng:llng,search:$text},postCallBack);
     })

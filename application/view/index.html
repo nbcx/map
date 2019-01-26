@@ -243,6 +243,7 @@
                     return;
                 }
                 map.clearOverlays();//清空原来的标注
+                map.addOverlay(new BMap.Marker(new BMap.Point(llng,llat),{icon:icon}));//标出所在地
                 $.post("/index/post",{lat:llat,lng:llng,start:num},function(result){
                     var suppliers =JSON.parse(result);
                     drawlist(suppliers[0],suppliers[1]);
@@ -351,9 +352,7 @@
         }
         search = $text;
         map.clearOverlays();//清空原来的标注
-        var point=new BMap.Point(llng,llat);
-        var marker = new BMap.Marker(point,{icon:icon});
-        map.addOverlay(marker);//标出所在地
+        map.addOverlay(new BMap.Marker(new BMap.Point(llng,llat),{icon:icon}));//标出所在地
         //map.panTo(point);//地图中心移动
         $.post("/index/post",{lat:llat,lng:llng,search:$text},postCallBack);
     })

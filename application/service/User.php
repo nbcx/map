@@ -10,6 +10,7 @@
 namespace service;
 
 use nb\Session;
+use util\Auth;
 use util\Service;
 
 /**
@@ -91,7 +92,7 @@ class User extends Service {
         }
 
         //只有系统管理员可以删除用户
-        if($user->type) {
+        if(Auth::init()->type) {
             $this->msg = '无权限删除';
             return false;
         }
