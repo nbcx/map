@@ -10,7 +10,6 @@
 namespace model;
 
 use nb\Model;
-use sdk\Bar;
 
 /**
  * User
@@ -31,7 +30,7 @@ class User extends Model {
     }
 
     protected function _identity() {
-        return $this->type?'业务管理员':'系统管理员';
+        return ['系统管理员','高级管理','普通管理'][$this->type];
     }
 
 }

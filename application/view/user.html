@@ -36,8 +36,8 @@
                         <td>{$v.identity}</td>
                         <td>{$v.date}</td>
                         <td>
+                            <a href="/admin/edit?id={$v.id}" class="btn btn-xs btn-primary btn-dragsort"><span class="glyphicon glyphicon-pencil"></span></a>
                             <if condition="$v.isdel">
-                                <a href="/admin/edit?id={$v.id}" class="btn btn-xs btn-primary btn-dragsort"><span class="glyphicon glyphicon-pencil"></span></a>
                                 <a href="/admin/post?action=del&id={$v.id}" confirm="确定删除该用户吗？" class="btn btn-danger btn-xs btn-dragsort"><span class="glyphicon glyphicon-trash"></span></a>
                             </if>
                         </td>

@@ -29,7 +29,7 @@ class Login extends Controller {
 
     public function post($action) {
        User::run($action,function ($msg) {
-            ed($msg);
+            $this->tips($msg);
        });
 
        redirect($action == 'in'?'/supplier':'/');
